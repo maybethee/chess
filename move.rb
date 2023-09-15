@@ -3,7 +3,7 @@ class Move
   
   attr_accessor :user_move_string, :origin_coordinates, :origin_symbol, :destination_coordinates, :destination_symbol, :current_game_board
 
-  def initialize(current_game_board, user_move_string = nil)
+  def initialize(current_game_board, user_move_string)
     # @game_board should be the attribute from Game class
     @current_game_board = current_game_board
     #move is user inputted coordinate String
@@ -25,7 +25,7 @@ class Move
 
   def move_piece
     @current_game_board[@destination_coordinates[0]][@destination_coordinates[1]].symbol = @origin_symbol
-    @current_game_board[@origin_coordinates[0]][@origin_coordinates[1]].symbol = ' '    
+    @current_game_board[@origin_coordinates[0]][@origin_coordinates[1]].symbol = ' '
   end
 
   def undo_move
