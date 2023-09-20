@@ -1,25 +1,27 @@
 require_relative 'board'
 require_relative 'cell'
 require_relative 'move'
+require_relative 'piece'
 require 'colorize'
 
 
 class Game
   attr_accessor :board
-
+  
   def initialize
     @board = Board.new
   end
 
   def play
+    @board.cells[5][3].square = Piece.new('P', 'white')
     @board.print_board
-
-    current_move = Move.new(@board.cells, player_input)
-    current_move.move_piece
-    @board.print_board
-    current_move.undo_move
-    @board.print_board
-    nil
+    loop do
+      current_move = Move.new(@board.cells, player_input)
+      current_move.execute_move
+      @board.print_board
+      # current_move.undo_move
+      # @board.print_board
+    end
   end
 
   def player_input

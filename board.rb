@@ -8,20 +8,17 @@ class Board
   def initialize
     # full board minus two back rows added manually later
     @cells = Array.new(6) { Array.new(8) { Cell.new } }
-    @back_row_white = BACK_PIECES.map { |piece| Cell.new(piece, 'white') }
-    @back_row_black = BACK_PIECES.map { |piece| Cell.new(piece, 'black') }
+    @back_row_white = BACK_PIECES.map { |piece| Cell.new(Piece.new("#{piece}", 'white')) }
+    @back_row_black = BACK_PIECES.map { |piece| Cell.new(Piece.new("#{piece}", 'black')) }
     fill_pieces
   end
   
-  
   def fill_pawns
     @cells[0].each do |cell|
-      cell.symbol = 'P'
-      cell.color = 'white'
+      cell.square = Piece.new('P', 'white')
     end
     @cells[5].each do |cell|
-      cell.symbol = 'P'
-      cell.color = 'black'
+      cell.square = Piece.new('P', 'black')
     end
   end
   
@@ -34,19 +31,10 @@ class Board
   def print_board
     puts '  ________________________________'
     @cells.each_with_index do |row, id|
-      puts "#{id + 1}| #{row.each(&:symbol).join(' | ')} |"
+      puts "#{id + 1}| #{row.map { |cell| cell.square.to_s }.join(' | ')} |"
       puts ' |___|___|___|___|___|___|___|___|'
     end
     puts '   A   B   C   D   E   F   G   H'
     puts
-  end
-
-  # these methods will go in Board class i suppose? or maybe Game class since the input used in them will likely be received in the Game class... or another class altogether? a Move class??
-  def translate_origin_coordinates(coordinate_string, char_int_hash)
-    [(coordinate_string[1].to_i - 1), char_int_hash.fetch(coordinate_string[0].to_sym)]
-  end
-
-  def translate_dest_coordinates(coordinate_string, char_int_hash)
-    [(coordinate_string[3].to_i - 1), char_int_hash.fetch(coordinate_string[2].to_sym)]
   end
 end

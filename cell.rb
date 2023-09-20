@@ -1,18 +1,15 @@
 require 'colorize'
 
 class Cell
-  attr_accessor :symbol, :color
+  attr_accessor :square
 
-  def initialize(symbol = ' ', color = nil)
-    @symbol = symbol
-    @color = color
-  end 
+  def initialize(square = ' ')
+    @square = square
+    # @color = color
+  end
 
-  def to_s
-    if @color.nil?
-      @symbol
-    else
-      @symbol.colorize(@color.to_sym)
-    end
+  def empty?
+    p "square is #{@square} right?" if @square == ' '
+    true if @square == ' '
   end
 end
