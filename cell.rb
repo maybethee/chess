@@ -9,7 +9,7 @@ class Cell
   end
 
   def empty?
-    p "square is #{@square} right?" if @square == ' '
+    p "square is empty, right?" if @square == ' '
     true if @square == ' '
   end
 end

@@ -1,7 +1,7 @@
 require 'colorize'
 
 class Board
-  BACK_PIECES = ['R', 'N', 'B', 'K', 'Q', 'B', 'N', 'R'].freeze
+  BACK_PIECES = %w[R N B K Q B N R].freeze
   
   attr_accessor :cells, :back_row_white, :back_row_black
   
@@ -16,9 +16,11 @@ class Board
   def fill_pawns
     @cells[0].each do |cell|
       cell.square = Piece.new('P', 'white')
+      # cell.color = 'white'
     end
     @cells[5].each do |cell|
       cell.square = Piece.new('P', 'black')
+      # cell.color = 'black'
     end
   end
   
@@ -28,6 +30,8 @@ class Board
     @cells.push(@back_row_black)
   end
 
+  # maybe add a parameter to print_board for player.color (when you make player class)
+  # if i do this i need to figure out how to change calling coordinates on move_piece/translate_move_string
   def print_board
     puts '  ________________________________'
     @cells.each_with_index do |row, id|

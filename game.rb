@@ -13,7 +13,10 @@ class Game
   end
 
   def play
-    @board.cells[5][3].square = Piece.new('P', 'white')
+    # @board.cells[5][3].square = Piece.new('P', 'black')
+    # @board.cells[3][3].square = Piece.new('P', 'black')
+    # @board.cells[2][4].square = Piece.new('P', 'black')
+    
     @board.print_board
     loop do
       current_move = Move.new(@board.cells, player_input)
