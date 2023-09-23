@@ -7,7 +7,7 @@ class Move
     # @game_board should be the attribute from Game class
     @current_game_board = current_game_board
     
-    #move is user inputted coordinate String
+    # move is user inputted coordinate String
     @user_move_string = user_move_string
 
     # something to test, see if these attributes change accordingly after another move gets made, assuming subsequent moves get made by updating @user_move_string in Move object in #play method.
@@ -26,7 +26,6 @@ class Move
     @destination_piece = @destination_cell.square
   end
 
-    # these methods will go in Board class i suppose? or maybe Game class since the input used in them will likely be received in the Game class... or another class altogether? a Move class??
   def translate_origin_coordinates(coordinate_string, char_int_hash)
     # if string looks like 'e7e5', origin_coordinates array looks like this:
     # [6, 4]
@@ -50,12 +49,37 @@ class Move
       puts "can't move what's not there!"
 
       #for whatever big legal_move method that ends up here, it should differentiate evaluations based on origin_piece.type
-    elsif legal_pawn_move?
+    elsif legal_queen_move?
       move_piece
     else
       puts 'something else went wrong'
     end
   end    
+  
+  def first_move?(piece)
+    # figure out why i need this here i forgot
+    false if piece == ' '
+    
+    true if piece.has_moved == false
+  end
+
+  def vertical?
+    true if difference(@origin_coordinates[0], @destination_coordinates[0]) > 0 && difference(@origin_coordinates[1], @destination_coordinates[1]).zero?
+  end
+
+  def horizontal?
+    true if difference(@origin_coordinates[1], @destination_coordinates[1]) > 0 && difference(@origin_coordinates[0], @destination_coordinates[0]).zero?
+  end
+
+  def diagonal?
+    true if difference(@origin_coordinates[0], @destination_coordinates[0]) == difference(@origin_coordinates[1], @destination_coordinates[1])
+  end
+  
+  def difference(a, b)
+    (a - b).abs
+  end
+
+  # pawn specific methods
 
   def legal_pawn_move?
     one_space = pawn_one_space?
@@ -96,39 +120,43 @@ class Move
     diagonal && has_piece
   end
   
-  def first_move?(piece)
-    # figure out why i need this here i forgot
-    false if piece == ' '
-    
-    true if piece.has_moved == false
-  end
-
-  def vertical?
-    true if difference(@origin_coordinates[0], @destination_coordinates[0]) > 0 && difference(@origin_coordinates[1], @destination_coordinates[1]).zero?
-  end
-
-  def horizontal?
-    true if difference(@origin_coordinates[1], @destination_coordinates[1]) > 0 && difference(@origin_coordinates[0], @destination_coordinates[0]).zero?
-  end
-
-  #make sure this way of checking diagonal movement specifically works with path_clear? check later 
-  def diagonal?
-    true if difference(@origin_coordinates[0], @destination_coordinates[0]) > 0 && difference(@origin_coordinates[1], @destination_coordinates[1]) > 0
-  end
-  
-  def difference(a, b)
-    (a - b).abs
-  end
-
-  # pawn specific methods
-  
   def diagonal_pawn?
     true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 1 && @origin_coordinates[0] > @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]) == 1
   end
 
-    # maybe this method could include player.color as a parameter and give it an if else block where they do the opposite "forward"
+    # maybe this/other methods could include player.color as a parameter and give it an if else block where they do the opposite "forward"
   def forward?(spaces)
     true if difference(@origin_coordinates[0], @destination_coordinates[0]) == spaces && @origin_coordinates[0] > @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]).zero?
+  end
+
+  # rook specific methods
+
+  def legal_rook_move?
+    vertical_movement = vertical? && vertical_path_clear?
+
+    horizontal_movement = horizontal? && horizontal_path_clear?
+
+    vertical_movement || horizontal_movement
+  end
+
+  # bishop specific methods
+
+  def legal_bishop_move?
+    movement = diagonal?
+
+    path_clear = diagonal_path_clear?
+
+    movement && path_clear
+  end
+
+  # queen specific methods
+
+  def legal_queen_move?
+    rook = legal_rook_move?
+
+    bishop = legal_bishop_move?
+
+    rook || bishop
   end
 
   # path clear methods
@@ -150,5 +178,58 @@ class Move
     end 
     true
   end
-    
+
+  def horizontal_path_clear?
+    puts "doing horizontal\n\n"
+    current_origin = @origin_coordinates.dup
+    current_destination = @destination_coordinates.dup
+  
+    if @destination_coordinates[1] > @origin_coordinates[1]
+      until current_origin[1] >= current_destination[1] - 1
+        current_origin[1] += 1
+        puts "(adding) current origin after increment: #{current_origin[0]}"
+        return false if !current_game_board[current_origin[0]][current_origin[1]].empty?
+      end
+    else
+      until current_origin[1] <= current_destination[1] + 1
+        current_origin[1] -= 1
+        puts "(subtract) current origin after increment: #{current_origin[0]}"
+        return false if !current_game_board[current_origin[0]][current_origin[1]].empty?
+      end
+    end 
+    true
+  end
+
+  def diagonal_path_clear?
+    current_origin = @origin_coordinates.dup
+    current_destination = @destination_coordinates.dup
+
+    if @destination_coordinates[1] > @origin_coordinates[1] && @destination_coordinates[0] > @origin_coordinates[0]
+      until current_origin[1] >= current_destination[1] - 1
+        current_origin[0] += 1
+        current_origin[1] += 1
+        return false if !current_game_board[current_origin[0]][current_origin[1]].empty?
+      end
+    elsif @destination_coordinates[1] > @origin_coordinates[1] && @destination_coordinates[0] < @origin_coordinates[0]
+      until current_origin[1] >= current_destination[1] - 1
+        current_origin[0] -= 1
+        current_origin[1] += 1
+        return false if !current_game_board[current_origin[0]][current_origin[1]].empty?
+      end
+    elsif @destination_coordinates[1] < @origin_coordinates[1] && @destination_coordinates[0] < @origin_coordinates[0]
+      until current_origin[1] <= current_destination[1] + 1
+        current_origin[0] -= 1
+        current_origin[1] -= 1
+        return false if !current_game_board[current_origin[0]][current_origin[1]].empty?
+      end
+    elsif @destination_coordinates[1] < @origin_coordinates[1] && @destination_coordinates[0] > @origin_coordinates[0]
+      until current_origin[1] <= current_destination[1] + 1
+        current_origin[0] += 1
+        current_origin[1] -= 1
+        return false if !current_game_board[current_origin[0]][current_origin[1]].empty?
+      end
+    end
+    true
+  end
+  
 end
