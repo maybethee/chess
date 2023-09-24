@@ -1,13 +1,13 @@
 class Move
   CHAR_CONVERSION = { "a": 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7 }.freeze
-  
+                                                
   attr_accessor :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board
 
   def initialize(current_game_board, user_move_string = nil)
     # @game_board should be the attribute from Game class
     @current_game_board = current_game_board
     
-    # move is user inputted coordinate String
+    #move is user inputted coordinate String
     @user_move_string = user_move_string
 
     # something to test, see if these attributes change accordingly after another move gets made, assuming subsequent moves get made by updating @user_move_string in Move object in #play method.
@@ -49,7 +49,7 @@ class Move
       puts "can't move what's not there!"
 
       #for whatever big legal_move method that ends up here, it should differentiate evaluations based on origin_piece.type
-    elsif legal_queen_move?
+    elsif legal_king_move?
       move_piece
     else
       puts 'something else went wrong'
@@ -71,6 +71,7 @@ class Move
     true if difference(@origin_coordinates[1], @destination_coordinates[1]) > 0 && difference(@origin_coordinates[0], @destination_coordinates[0]).zero?
   end
 
+  #make sure this way of checking diagonal movement specifically works with path_clear? check later 
   def diagonal?
     true if difference(@origin_coordinates[0], @destination_coordinates[0]) == difference(@origin_coordinates[1], @destination_coordinates[1])
   end
@@ -124,9 +125,18 @@ class Move
     true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 1 && @origin_coordinates[0] > @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]) == 1
   end
 
-    # maybe this/other methods could include player.color as a parameter and give it an if else block where they do the opposite "forward"
+    # maybe this method could include player.color as a parameter and give it an if else block where they do the opposite "forward"
   def forward?(spaces)
     true if difference(@origin_coordinates[0], @destination_coordinates[0]) == spaces && @origin_coordinates[0] > @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]).zero?
+  end
+
+  # knight specific methods
+  def legal_knight_move?
+    knight_one_two = true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 1 && difference(@origin_coordinates[1], @destination_coordinates[1]) == 2
+
+    knight_two_one = true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 2 && difference(@origin_coordinates[1], @destination_coordinates[1]) == 1
+
+    knight_one_two || knight_two_one
   end
 
   # rook specific methods
@@ -159,6 +169,18 @@ class Move
     rook || bishop
   end
 
+  # king specific methods
+
+  def legal_king_move?
+
+    one_space = true if difference(@origin_coordinates[0], @destination_coordinates[0]) < 2 && difference(@origin_coordinates[1], @destination_coordinates[1]) < 2
+
+    # should specific check restrictions happen here or in another method? same with castling
+
+    one_space
+  end
+
+
   # path clear methods
 
   def vertical_path_clear?
@@ -168,11 +190,13 @@ class Move
     if @destination_coordinates[0] > @origin_coordinates[0]
       until current_origin[0] >= current_destination[0] - 1
         current_origin[0] += 1
+        puts "(adding) current origin after increment: #{current_origin[0]}"
         return false if !current_game_board[current_origin[0]][current_origin[1]].empty?
       end
     else
       until current_origin[0] <= current_destination[0] + 1
         current_origin[0] -= 1
+        puts "(subtract) current origin after increment: #{current_origin[0]}"
         return false if !current_game_board[current_origin[0]][current_origin[1]].empty?
       end
     end 
@@ -200,6 +224,7 @@ class Move
     true
   end
 
+  # need to think of how to make this more concise...
   def diagonal_path_clear?
     current_origin = @origin_coordinates.dup
     current_destination = @destination_coordinates.dup
