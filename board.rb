@@ -1,7 +1,7 @@
 require 'colorize'
 
 class Board
-  BACK_PIECES = %w[R N B K Q B N R].freeze
+  BACK_PIECES = %w[R N B Q K B N R].freeze
   
   attr_accessor :cells, :back_row_white, :back_row_black
   

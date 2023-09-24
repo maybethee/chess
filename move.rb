@@ -1,6 +1,7 @@
 class Move
   CHAR_CONVERSION = { "a": 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7 }.freeze
-                                                
+  LEGAL_MOVESETS = %i[pawn_legal_move? knight_legal_move? rook_legal_move? bishop_legal_move? queen_legal_move? king_legal_move?].freeze
+
   attr_accessor :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board
 
   def initialize(current_game_board, user_move_string = nil)
@@ -10,7 +11,6 @@ class Move
     #move is user inputted coordinate String
     @user_move_string = user_move_string
 
-    # something to test, see if these attributes change accordingly after another move gets made, assuming subsequent moves get made by updating @user_move_string in Move object in #play method.
     @origin_coordinates = translate_origin_coordinates(@user_move_string.downcase, CHAR_CONVERSION)
 
     # this points to the Cell object at these specific coordinates of the Board object's @cells array
@@ -22,7 +22,7 @@ class Move
     @destination_coordinates = translate_destination_coordinates(@user_move_string.downcase, CHAR_CONVERSION)
 
     @destination_cell = current_game_board[@destination_coordinates[0]][@destination_coordinates[1]]
-    
+
     @destination_piece = @destination_cell.square
   end
 
@@ -49,12 +49,16 @@ class Move
       puts "can't move what's not there!"
 
       #for whatever big legal_move method that ends up here, it should differentiate evaluations based on origin_piece.type
-    elsif legal_king_move?
+    elsif legal_move?
       move_piece
     else
       puts 'something else went wrong'
     end
   end    
+
+  def legal_move?
+    LEGAL_MOVESETS.find { |moveset| send(moveset) }
+  end
   
   def first_move?(piece)
     # figure out why i need this here i forgot
@@ -82,7 +86,9 @@ class Move
 
   # pawn specific methods
 
-  def legal_pawn_move?
+  def pawn_legal_move?
+    return false unless @origin_piece.type == 'P'
+    
     one_space = pawn_one_space?
     
     two_spaces = pawn_two_space?
@@ -131,7 +137,9 @@ class Move
   end
 
   # knight specific methods
-  def legal_knight_move?
+  def knight_legal_move?
+    return false unless @origin_piece.type == 'N'
+
     knight_one_two = true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 1 && difference(@origin_coordinates[1], @destination_coordinates[1]) == 2
 
     knight_two_one = true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 2 && difference(@origin_coordinates[1], @destination_coordinates[1]) == 1
@@ -141,7 +149,9 @@ class Move
 
   # rook specific methods
 
-  def legal_rook_move?
+  def rook_legal_move?
+    return false unless @origin_piece.type == 'R'
+    
     vertical_movement = vertical? && vertical_path_clear?
 
     horizontal_movement = horizontal? && horizontal_path_clear?
@@ -151,7 +161,9 @@ class Move
 
   # bishop specific methods
 
-  def legal_bishop_move?
+  def bishop_legal_move?
+    return false unless @origin_piece.type == 'B'
+    
     movement = diagonal?
 
     path_clear = diagonal_path_clear?
@@ -161,17 +173,22 @@ class Move
 
   # queen specific methods
 
-  def legal_queen_move?
-    rook = legal_rook_move?
+  def queen_legal_move?
+    return false unless @origin_piece.type == 'Q'
+    
+    vertical_movement = vertical? && vertical_path_clear?
 
-    bishop = legal_bishop_move?
+    horizontal_movement = horizontal? && horizontal_path_clear?
 
-    rook || bishop
+    diagonal_movement = diagonal? && diagonal_path_clear?
+
+    vertical_movement || horizontal_movement || diagonal_movement
   end
 
   # king specific methods
 
-  def legal_king_move?
+  def king_legal_move?
+    return false unless @origin_piece.type == 'K'
 
     one_space = true if difference(@origin_coordinates[0], @destination_coordinates[0]) < 2 && difference(@origin_coordinates[1], @destination_coordinates[1]) < 2
 
