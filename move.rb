@@ -4,9 +4,11 @@ class Move
 
   attr_accessor :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board
 
-  def initialize(current_game_board, user_move_string = nil)
-    # @game_board should be the attribute from Game class
+  def initialize(current_game_board, current_player, user_move_string = nil)
+    # @current_game_board and @current_player should be the attributes from Game class
     @current_game_board = current_game_board
+    
+    @current_player = current_player
     
     #move is user inputted coordinate String
     @user_move_string = user_move_string
@@ -47,21 +49,25 @@ class Move
   def execute_move
     if @origin_cell.empty?
       puts "can't move what's not there!"
+      return false
 
-      #for whatever big legal_move method that ends up here, it should differentiate evaluations based on origin_piece.type
     elsif legal_move?
       move_piece
+      return true
     else
       puts 'something else went wrong'
+      return false
     end
   end    
 
   def legal_move?
+    puts "origin piece color is #{@origin_piece.color}"
+    puts "current player color is #{@current_player.color}\n\n"
+    
     LEGAL_MOVESETS.find { |moveset| send(moveset) }
   end
   
   def first_move?(piece)
-    # figure out why i need this here i forgot
     false if piece == ' '
     
     true if piece.has_moved == false
@@ -84,10 +90,20 @@ class Move
     (a - b).abs
   end
 
+  def self_capture?
+    return true if @destination_cell.empty?
+ 
+    return true unless @destination_piece.color == @current_player.color
+  end
+
+  def right_color?
+    return true unless @origin_piece.color != @current_player.color
+  end
+
   # pawn specific methods
 
   def pawn_legal_move?
-    return false unless @origin_piece.type == 'P'
+    return false unless right_color? && @origin_piece.type == 'P'
     
     one_space = pawn_one_space?
     
@@ -119,6 +135,8 @@ class Move
   end
 
   def pawn_capture?
+    return false unless self_capture?
+    
     diagonal = diagonal_pawn?
 
     # this should eventually also specify color, otherwise self-capture will be possible
@@ -138,7 +156,7 @@ class Move
 
   # knight specific methods
   def knight_legal_move?
-    return false unless @origin_piece.type == 'N'
+    return false unless right_color? && self_capture? && @origin_piece.type == 'N'
 
     knight_one_two = true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 1 && difference(@origin_coordinates[1], @destination_coordinates[1]) == 2
 
@@ -150,7 +168,7 @@ class Move
   # rook specific methods
 
   def rook_legal_move?
-    return false unless @origin_piece.type == 'R'
+    return false unless right_color? && self_capture? && @origin_piece.type == 'R'
     
     vertical_movement = vertical? && vertical_path_clear?
 
@@ -162,7 +180,9 @@ class Move
   # bishop specific methods
 
   def bishop_legal_move?
-    return false unless @origin_piece.type == 'B'
+    # puts "destination piece color is #{@destination_piece.color}"
+    # puts "current player color is #{@current_player.color}"
+    return false unless right_color? && self_capture? && @origin_piece.type == 'B'
     
     movement = diagonal?
 
@@ -173,8 +193,8 @@ class Move
 
   # queen specific methods
 
-  def queen_legal_move?
-    return false unless @origin_piece.type == 'Q'
+  def queen_legal_move? 
+    return false unless right_color? && self_capture? && @origin_piece.type == 'Q'
     
     vertical_movement = vertical? && vertical_path_clear?
 
@@ -188,15 +208,13 @@ class Move
   # king specific methods
 
   def king_legal_move?
-    return false unless @origin_piece.type == 'K'
+    return false unless right_color? && self_capture? && @origin_piece.type == 'K'
 
     one_space = true if difference(@origin_coordinates[0], @destination_coordinates[0]) < 2 && difference(@origin_coordinates[1], @destination_coordinates[1]) < 2
-
     # should specific check restrictions happen here or in another method? same with castling
 
     one_space
   end
-
 
   # path clear methods
 
