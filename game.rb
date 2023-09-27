@@ -30,7 +30,7 @@ class Game
   end
 
   def player_input
-    puts "@current_player, enter your move\n\n"
+    puts "#{@current_player.color}, enter your move\n\n"
     loop do
       error_message = 'invalid input\n\n'
       player_move_string = gets.chomp

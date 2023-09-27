@@ -81,7 +81,6 @@ class Move
     true if difference(@origin_coordinates[1], @destination_coordinates[1]) > 0 && difference(@origin_coordinates[0], @destination_coordinates[0]).zero?
   end
 
-  #make sure this way of checking diagonal movement specifically works with path_clear? check later 
   def diagonal?
     true if difference(@origin_coordinates[0], @destination_coordinates[0]) == difference(@origin_coordinates[1], @destination_coordinates[1])
   end
@@ -115,7 +114,6 @@ class Move
   end
 
   def pawn_one_space?
-    # using forward? in this and the two_space method means i need to figure out how to flip it once i make computer movement or make the colors/movement vary
     one_space = forward?(1)
 
     path_clear = @destination_cell.empty?
@@ -146,12 +144,21 @@ class Move
   end
   
   def diagonal_pawn?
-    true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 1 && @origin_coordinates[0] > @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]) == 1
+    # black vs. white changes whether operator comparing origin and destination[0] is greater or less than determining possible direction "forward"
+    if @current_player.color == 'black'
+      true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 1 && @origin_coordinates[0] > @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]) == 1
+    else
+      true if difference(@origin_coordinates[0], @destination_coordinates[0]) == 1 && @origin_coordinates[0] < @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]) == 1
+    end   
   end
 
-    # maybe this method could include player.color as a parameter and give it an if else block where they do the opposite "forward"
   def forward?(spaces)
-    true if difference(@origin_coordinates[0], @destination_coordinates[0]) == spaces && @origin_coordinates[0] > @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]).zero?
+    # black vs. white changes whether operator comparing origin and destination[0] is greater or less than determining possible direction "forward"
+    if @current_player.color == 'black'
+      true if difference(@origin_coordinates[0], @destination_coordinates[0]) == spaces && @origin_coordinates[0] > @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]).zero?
+    else
+      true if difference(@origin_coordinates[0], @destination_coordinates[0]) == spaces && @origin_coordinates[0] < @destination_coordinates[0] && difference(@origin_coordinates[1], @destination_coordinates[1]).zero?
+    end
   end
 
   # knight specific methods
@@ -291,5 +298,5 @@ class Move
     end
     true
   end
-  
+
 end
