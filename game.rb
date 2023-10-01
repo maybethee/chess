@@ -3,6 +3,7 @@ require_relative 'player'
 require_relative 'cell'
 require_relative 'move'
 require_relative 'piece'
+require_relative 'legal'
 require 'colorize'
 
 
