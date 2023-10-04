@@ -1,5 +1,4 @@
 module PieceMovement
-
   # pawn specific methods
 
   def pawn_legal_move?
@@ -20,7 +19,7 @@ module PieceMovement
     one_space = forward?(1)
 
     path_clear = @move.destination_cell.empty?
-    
+
     one_space && path_clear
   end
 
@@ -36,11 +35,10 @@ module PieceMovement
   end
 
   def pawn_capture?
-    return false unless self_capture?
+    return false unless legal_capture?
 
     diagonal = diagonal_pawn?
 
-    # this should eventually also specify color, otherwise self-capture will be possible
     has_piece = !@move.destination_cell.empty?
 
     diagonal && has_piece
@@ -52,7 +50,7 @@ module PieceMovement
       true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == 1 && @move.origin_coordinates[0] > @move.destination_coordinates[0] && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) == 1
     else
       true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == 1 && @move.origin_coordinates[0] < @move.destination_coordinates[0] && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) == 1
-    end   
+    end
   end
 
   def forward?(spaces)
@@ -67,7 +65,7 @@ module PieceMovement
   # knight specific methods
 
   def knight_legal_move?
-    return false unless right_color? && self_capture? && @move.origin_piece.type == 'N'
+    return false unless right_color? && legal_capture? && @move.origin_piece.type == 'N'
 
     knight_one_two = true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == 1 && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) == 2
 
@@ -80,7 +78,7 @@ module PieceMovement
   # rook specific methods
 
   def rook_legal_move?
-    return false unless right_color? && self_capture? && @move.origin_piece.type == 'R'
+    return false unless right_color? && legal_capture? && @move.origin_piece.type == 'R'
 
     vertical_movement = vertical? && vertical_path_clear?
 
@@ -94,7 +92,7 @@ module PieceMovement
   def bishop_legal_move?
     # puts "destination piece color is #{@destination_piece.color}"
     # puts "current player color is #{@current_player.color}"
-    return false unless right_color? && self_capture? && @move.origin_piece.type == 'B'
+    return false unless right_color? && legal_capture? && @move.origin_piece.type == 'B'
 
     movement = diagonal?
 
@@ -106,7 +104,7 @@ module PieceMovement
   # queen specific methods
 
   def queen_legal_move?
-    return false unless right_color? && self_capture? && @move.origin_piece.type == 'Q'
+    return false unless right_color? && legal_capture? && @move.origin_piece.type == 'Q'
 
     vertical_movement = vertical? && vertical_path_clear?
 
@@ -114,17 +112,25 @@ module PieceMovement
 
     diagonal_movement = diagonal? && diagonal_path_clear?
 
-    vertical_movement || horizontal_movement || diagonal_movement
+    if vertical_movement || horizontal_movement || diagonal_movement
+      puts 'there is a legal queen move'
+      true
+    else
+      return false
+    end
   end
 
   # king specific methods
 
   def king_legal_move?
-    return false unless right_color? && self_capture? && @move.origin_piece.type == 'K'
+    return false unless right_color? && legal_capture? && @move.origin_piece.type == 'K'
 
-    one_space = true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) < 2 && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) < 2
     # should specific check restrictions happen here or in another method? same with castling
 
-    one_space
+    file_one_space = difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) < 2
+
+    rank_one_space = difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) < 2
+
+    rank_one_space && file_one_space
   end
 end

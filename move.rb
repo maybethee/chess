@@ -7,8 +7,8 @@ class Move
     # @current_game_board and @current_player should be the attributes from Game class
     @current_game_board = current_game_board
     @current_player = current_player
-    
-    #move is user inputted coordinate String
+
+    # move is user inputted coordinate String
     @user_move_string = user_move_string
 
     @origin_coordinates = translate_origin_coordinates(@user_move_string.downcase, CHAR_CONVERSION)
@@ -37,21 +37,38 @@ class Move
 
   def move_piece
     @destination_cell.square = @origin_piece
-    @origin_cell.square = ' '  
+    @origin_cell.square = ' '
 
     @origin_piece.has_moved = true
+  end
+
+  def undo_move
+    puts "i undid the last move"
+    @origin_cell.square = @origin_piece
+    @destination_cell.square = @destination_piece
+
+    @origin_piece.has_moved = false
   end
 
   def execute_move
     if @origin_cell.empty?
       puts "can't move what's not there!"
       return false
-    elsif LegalityChecker.new(self, @current_player).legal_move?
-      move_piece
-      return true
-    else
+    end
+
+    unless LegalityChecker.new(self, @current_player).legal_move?
       puts 'something else went wrong'
       return false
     end
-  end    
+
+    move_piece
+  
+    if LegalityChecker.new(self, @current_player).safe_from_check?
+      return true
+    else
+      undo_move
+      puts 'not safe from check'
+      return false
+    end
+  end
 end

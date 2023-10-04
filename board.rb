@@ -2,9 +2,9 @@ require 'colorize'
 
 class Board
   BACK_PIECES = %w[R N B Q K B N R].freeze
-  
+
   attr_accessor :cells, :back_row_white, :back_row_black
-  
+
   def initialize
     # full board minus two back rows added manually later
     @cells = Array.new(6) { Array.new(8) { Cell.new } }
@@ -12,18 +12,16 @@ class Board
     @back_row_black = BACK_PIECES.map { |piece| Cell.new(Piece.new("#{piece}", 'black')) }
     fill_pieces
   end
-  
+
   def fill_pawns
     @cells[0].each do |cell|
       cell.square = Piece.new('P', 'white')
-      # cell.color = 'white'
     end
     @cells[5].each do |cell|
       cell.square = Piece.new('P', 'black')
-      # cell.color = 'black'
     end
   end
-  
+
   def fill_pieces
     fill_pawns
     @cells.unshift(@back_row_white)
