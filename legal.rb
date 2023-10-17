@@ -7,7 +7,14 @@ class LegalityChecker
   include PieceMovement
   include KingThreat
 
-  LEGAL_MOVESETS = %i[pawn_legal_move? knight_legal_move? rook_legal_move? bishop_legal_move? queen_legal_move? king_legal_move?].freeze
+  LEGAL_MOVE_TYPES = {
+    pawn_legal_move?: 'P',
+    knight_legal_move?: 'N',
+    rook_legal_move?: 'R',
+    bishop_legal_move?: 'B',
+    king_legal_move?: 'K',
+    queen_legal_move?: 'Q'
+  }.freeze
 
   attr_accessor :move, :current_player
 
@@ -17,7 +24,7 @@ class LegalityChecker
   end
 
   def legal_move?
-    LEGAL_MOVESETS.find { |moveset| send(moveset) }
+    send LEGAL_MOVE_TYPES.key(@move.origin_piece.type)
   end
 
   def first_move?(piece)
@@ -54,7 +61,7 @@ class LegalityChecker
   def diagonal?
     true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == difference(@move.origin_coordinates[1], @move.destination_coordinates[1])
   end
-
+  
   def difference(a, b)
     (a - b).abs
   end
