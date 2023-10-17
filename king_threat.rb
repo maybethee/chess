@@ -1,4 +1,5 @@
 module KingThreat
+
   # methods regarding being in check
 
   def coordinates_to_move_string(origin_coordinates, destination_coordinates)
@@ -13,41 +14,40 @@ module KingThreat
     "#{origin_file}#{origin_rank}#{destination_file}#{destination_rank}"
   end
 
-  def find_king
+  def find_king(player)
     return @move.destination_coordinates if @move.origin_piece.type == 'K'
 
     @move.current_game_board.each_with_index do |row, r_id|
       c_id = row.find_index do |cell|
         next if cell.empty?
 
-        cell.square.type == 'K' && cell.square.color == @current_player.color
+        cell.square.type == 'K' && cell.square.color == player.color
       end
       return [r_id, c_id] if c_id
     end
     nil
   end
 
-  def gather_piece_locations
-    other_player_pieces = []
+  # excludes the king in returned array by default
+  def gather_piece_locations(chosen_player)
+    player_pieces = []
     @move.current_game_board.each_with_index do |row, r_id|
       row.each_with_index do |cell, c_id|
         # ignore empty squares and King which cannot check
         next if cell.empty? || cell.square.type == 'K'
 
-        other_player_pieces << [r_id, c_id] unless cell.square.color == @current_player.color
+        player_pieces << [r_id, c_id] unless cell.square.color != chosen_player.color
       end
     end
-    other_player_pieces
+    player_pieces
   end
 
   def safe_from_check?
-    current_player_king = find_king
-    opponent_pieces = gather_piece_locations
-    opponent_color = @current_player.color == 'black' ? 'white' : 'black'
-    opponent_player = Player.new('opponent', opponent_color)
+    opponent_player = Player.new('opponent', @opponent_color)
+    current_player_king = find_king(@current_player)
+    opponent_pieces = gather_piece_locations(opponent_player)
 
     opponent_pieces.each do |coordinate_pair|
-
       new_move_string = coordinates_to_move_string(coordinate_pair, current_player_king)
 
       new_move = Move.new(@move.current_game_board, opponent_player, new_move_string)

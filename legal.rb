@@ -16,11 +16,12 @@ class LegalityChecker
     queen_legal_move?: 'Q'
   }.freeze
 
-  attr_accessor :move, :current_player
+  attr_accessor :move, :current_player, :opponent_color
 
   def initialize(move, current_player)
     @move = move
     @current_player = current_player
+    @opponent_color = @current_player.color == 'black' ? 'white' : 'black'
   end
 
   def legal_move?
@@ -61,7 +62,7 @@ class LegalityChecker
   def diagonal?
     true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == difference(@move.origin_coordinates[1], @move.destination_coordinates[1])
   end
-  
+
   def difference(a, b)
     (a - b).abs
   end
