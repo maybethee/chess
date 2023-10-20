@@ -22,6 +22,7 @@ class LegalityChecker
     @move = move
     @current_player = current_player
     @opponent_color = @current_player.color == 'black' ? 'white' : 'black'
+    @opponent_player = Player.new('opponent', @opponent_color.to_s)
   end
 
   def legal_move?
@@ -62,7 +63,7 @@ class LegalityChecker
   def diagonal?
     true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == difference(@move.origin_coordinates[1], @move.destination_coordinates[1])
   end
-
+  
   def difference(a, b)
     (a - b).abs
   end
