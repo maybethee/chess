@@ -23,7 +23,7 @@ class Game
       current_move = Move.new(@board.cells, @current_player, player_input)
 
       switch_players unless current_move.execute_move == false
-      
+
       @board.print_board
     end
   end

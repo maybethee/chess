@@ -10,12 +10,10 @@ module PieceMovement
 
     capture = pawn_capture?
 
-    one_space || two_spaces || capture
+    return one_space || two_spaces || capture
   end
 
   def pawn_one_space?
-    # using forward? in this and the two_space method means i need to figure out how to flip it once i make computer movement or make the colors/movement vary
-    # if @current_player.color == 'white'
     one_space = forward?(1)
 
     path_clear = @move.destination_cell.empty?
@@ -28,7 +26,7 @@ module PieceMovement
 
     two_spaces = forward?(2)
 
-    # need to check both because pawns cannot capture on forward movement, and path clear does not check destination square 
+    # need to check both because pawns cannot capture on forward movement, and path clear does not check destination square
     path_clear = vertical_path_clear? && @move.destination_cell.empty?
 
     first_move && two_spaces && path_clear
@@ -50,7 +48,7 @@ module PieceMovement
       true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == 1 && @move.origin_coordinates[0] > @move.destination_coordinates[0] && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) == 1
     else
       true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == 1 && @move.origin_coordinates[0] < @move.destination_coordinates[0] && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) == 1
-    end
+    end   
   end
 
   def forward?(spaces)
@@ -71,10 +69,9 @@ module PieceMovement
 
     knight_two_one = true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == 2 && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) == 1
 
-    knight_one_two || knight_two_one
+    return knight_one_two || knight_two_one
   end
 
-  # check the rest of these like the Knight method (but replace the method in #execute_move)
   # rook specific methods
 
   def rook_legal_move?
@@ -84,21 +81,19 @@ module PieceMovement
 
     horizontal_movement = horizontal? && horizontal_path_clear?
 
-    vertical_movement || horizontal_movement
+    return vertical_movement || horizontal_movement
   end
 
   # bishop specific methods
 
   def bishop_legal_move?
-    # puts "destination piece color is #{@destination_piece.color}"
-    # puts "current player color is #{@current_player.color}"
     return false unless right_color? && legal_capture? && @move.origin_piece.type == 'B'
 
     movement = diagonal?
 
     path_clear = diagonal_path_clear?
 
-    movement && path_clear
+    return movement && path_clear
   end
 
   # queen specific methods
@@ -112,12 +107,7 @@ module PieceMovement
 
     diagonal_movement = diagonal? && diagonal_path_clear?
 
-    if vertical_movement || horizontal_movement || diagonal_movement
-      puts 'there is a legal queen move'
-      true
-    else
-      return false
-    end
+    return vertical_movement || horizontal_movement || diagonal_movement
   end
 
   # king specific methods
@@ -125,12 +115,10 @@ module PieceMovement
   def king_legal_move?
     return false unless right_color? && legal_capture? && @move.origin_piece.type == 'K'
 
-    # should specific check restrictions happen here or in another method? same with castling
-
     file_one_space = difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) < 2
 
     rank_one_space = difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) < 2
 
-    rank_one_space && file_one_space
+    return rank_one_space && file_one_space
   end
 end

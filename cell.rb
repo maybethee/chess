@@ -5,11 +5,9 @@ class Cell
 
   def initialize(square = ' ')
     @square = square
-    # @color = color
   end
 
   def empty?
-    p "square is empty, right?" if @square == ' '
-    true if @square == ' '
+    @square == ' '
   end
 end

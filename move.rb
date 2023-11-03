@@ -1,5 +1,5 @@
 class Move
-  CHAR_CONVERSION = { "a": 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7 }.freeze
+  CHAR_CONVERSION = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7 }.freeze
 
   attr_reader :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board, :current_player
 
@@ -7,8 +7,8 @@ class Move
     # @current_game_board and @current_player should be the attributes from Game class
     @current_game_board = current_game_board
     @current_player = current_player
-    
-    #move is user inputted coordinate String
+
+    # move is user inputted coordinate String
     @user_move_string = user_move_string
 
     @origin_coordinates = translate_origin_coordinates(@user_move_string.downcase, CHAR_CONVERSION)
@@ -36,18 +36,13 @@ class Move
   end
 
   def move_piece
-    @destination_cell.square = @origin_piece
-    @origin_cell.square = ' '  
-
-    @origin_piece.has_moved = true
+    @destination_cell.square = @origin_piece  
+    @origin_cell.square = ' '
   end
 
   def undo_move
-    puts "i undid the last move"
     @origin_cell.square = @origin_piece
     @destination_cell.square = @destination_piece
-
-    @origin_piece.has_moved = false
   end
 
   def execute_move
@@ -56,16 +51,17 @@ class Move
       return false
     end
 
-    current_move = LegalityChecker.new(self, @current_player)
-
-    unless current_move.legal_move?
+    unless LegalityChecker.new(self, @current_player).legal_move?
       puts 'something else went wrong'
       return false
     end
 
     move_piece
-  
-    if current_move.safe_from_check?(@current_player)
+
+    if LegalityChecker.new(self, @current_player).safe_from_check?(@current_player)
+      # change state of has_moved once move has been finalized here
+      @origin_piece.has_moved = true
+      puts "not checkmated" unless LegalityChecker.new(self, @current_player).checkmate?
       return true
     else
       undo_move

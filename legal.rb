@@ -26,7 +26,9 @@ class LegalityChecker
   end
 
   def legal_move?
-    send LEGAL_MOVE_TYPES.key(@move.origin_piece.type)
+    LEGAL_MOVE_TYPES.any? do |method, piece_type|
+      send(method) if @move.origin_piece.type == piece_type
+    end
   end
 
   def first_move?(piece)
@@ -35,7 +37,6 @@ class LegalityChecker
     true if piece.has_moved == false
   end
 
-  # naming convention makes this confusing when it comes up in piece movement methods, how to rename to express that this checks for !self_capture
   def legal_capture?
     return true if @move.destination_cell.empty?
 
@@ -63,7 +64,7 @@ class LegalityChecker
   def diagonal?
     true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == difference(@move.origin_coordinates[1], @move.destination_coordinates[1])
   end
-  
+
   def difference(a, b)
     (a - b).abs
   end

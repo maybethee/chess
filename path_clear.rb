@@ -8,13 +8,11 @@ module PathClear
     if @move.destination_coordinates[0] > @move.origin_coordinates[0]
       until current_origin[0] >= current_destination[0] - 1
         current_origin[0] += 1
-        puts "(adding) current origin after increment: #{current_origin[0]}"
         return false unless @move.current_game_board[current_origin[0]][current_origin[1]].empty?
       end
     else
       until current_origin[0] <= current_destination[0] + 1
         current_origin[0] -= 1
-        puts "(subtract) current origin after increment: #{current_origin[0]}"
         return false unless @move.current_game_board[current_origin[0]][current_origin[1]].empty?
       end
     end
@@ -22,20 +20,17 @@ module PathClear
   end
 
   def horizontal_path_clear?
-    puts "doing horizontal\n\n"
     current_origin = @move.origin_coordinates.dup
     current_destination = @move.destination_coordinates.dup
 
     if @move.destination_coordinates[1] > @move.origin_coordinates[1]
       until current_origin[1] >= current_destination[1] - 1
         current_origin[1] += 1
-        puts "(adding) current origin after increment: #{current_origin[0]}"
         return false unless @move.current_game_board[current_origin[0]][current_origin[1]].empty?
       end
     else
       until current_origin[1] <= current_destination[1] + 1
         current_origin[1] -= 1
-        puts "(subtract) current origin after increment: #{current_origin[0]}"
         return false unless @move.current_game_board[current_origin[0]][current_origin[1]].empty?
       end
     end
