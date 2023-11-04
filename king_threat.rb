@@ -71,7 +71,6 @@ module KingThreat
         simulated_move.move_piece
 
         if LegalityChecker.new(simulated_move, @opponent_player).safe_from_check?(@opponent_player)
-          puts "not checkmated"
           simulated_move.undo_move
           return false
         else
@@ -79,7 +78,6 @@ module KingThreat
         end
       end
     end
-    puts 'CHECKMATE!'
     return true
   end
 

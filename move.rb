@@ -1,13 +1,13 @@
 class Move
   CHAR_CONVERSION = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7 }.freeze
 
-  attr_reader :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board, :current_player
+  attr_reader :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board, :current_player, :game_over
 
-  def initialize(current_game_board, current_player, user_move_string = nil)
+  def initialize(current_game_board, current_player, user_move_string = nil, game_over = false)
     # @current_game_board and @current_player should be the attributes from Game class
     @current_game_board = current_game_board
     @current_player = current_player
-
+    
     # move is user inputted coordinate String
     @user_move_string = user_move_string
 
@@ -22,6 +22,8 @@ class Move
 
     @destination_cell = current_game_board[@destination_coordinates[0]][@destination_coordinates[1]]
     @destination_piece = @destination_cell.square
+
+    @game_over = game_over
   end
   
   def translate_origin_coordinates(coordinate_string, char_int_hash)
@@ -58,15 +60,18 @@ class Move
 
     move_piece
 
-    if LegalityChecker.new(self, @current_player).safe_from_check?(@current_player)
-      # change state of has_moved once move has been finalized here
-      @origin_piece.has_moved = true
-      puts "not checkmated" unless LegalityChecker.new(self, @current_player).checkmate?
-      return true
-    else
+    unless LegalityChecker.new(self, @current_player).safe_from_check?(@current_player)
       undo_move
       puts 'not safe from check'
       return false
     end
+
+    # change state of has_moved once move has been finalized here
+    @origin_piece.has_moved = true
+
+    checkmate = LegalityChecker.new(self, @current_player).checkmate?
+    @game_over = true if checkmate
+    puts checkmate ? "Checkmate! #{@current_player.color} wins" : "not checkmated"
+    true
   end
 end

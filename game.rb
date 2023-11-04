@@ -6,11 +6,10 @@ require_relative 'piece'
 require_relative 'legal'
 require 'colorize'
 
-
 class Game
   attr_reader :players, :current_player
   attr_accessor :board
-  
+
   def initialize
     @board = Board.new
     @players = [Player.new('Player 1', 'white'), Player.new('Player 2', 'black')]
@@ -25,7 +24,10 @@ class Game
       switch_players unless current_move.execute_move == false
 
       @board.print_board
+
+      break if current_move.game_over == true
     end
+    puts 'game over, thanks for playing!'
   end
 
   def player_input
