@@ -3,9 +3,9 @@ module PieceMovement
 
   def pawn_legal_move?
     return false unless right_color? && @move.origin_piece.type == 'P'
-
+    
     one_space = pawn_one_space?
-
+    
     two_spaces = pawn_two_space?
 
     capture = pawn_capture?
@@ -17,7 +17,7 @@ module PieceMovement
     one_space = forward?(1)
 
     path_clear = @move.destination_cell.empty?
-
+    
     one_space && path_clear
   end
 
@@ -26,7 +26,7 @@ module PieceMovement
 
     two_spaces = forward?(2)
 
-    # need to check both because pawns cannot capture on forward movement, and path clear does not check destination square
+    # need to check both because pawns cannot capture on forward movement, and path clear does not check destination square 
     path_clear = vertical_path_clear? && @move.destination_cell.empty?
 
     first_move && two_spaces && path_clear
@@ -41,14 +41,14 @@ module PieceMovement
 
     diagonal && has_piece
   end
-
+  
   def diagonal_pawn?
     # black vs. white changes whether operator comparing origin and destination[0] is greater or less than determining possible direction "forward"
     if @current_player.color == 'black'
       true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == 1 && @move.origin_coordinates[0] > @move.destination_coordinates[0] && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) == 1
     else
       true if difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) == 1 && @move.origin_coordinates[0] < @move.destination_coordinates[0] && difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) == 1
-    end   
+    end
   end
 
   def forward?(spaces)
@@ -115,10 +115,30 @@ module PieceMovement
   def king_legal_move?
     return false unless right_color? && legal_capture? && @move.origin_piece.type == 'K'
 
+    one_space = king_one_space?
+
+    castle = castle?
+
+    return one_space || castle
+  end
+
+  def king_one_space?
     file_one_space = difference(@move.origin_coordinates[0], @move.destination_coordinates[0]) < 2
 
     rank_one_space = difference(@move.origin_coordinates[1], @move.destination_coordinates[1]) < 2
 
-    return rank_one_space && file_one_space
+    return file_one_space && rank_one_space
+  end
+
+  def castle?
+    return false unless right_color? && @move.origin_piece.type == 'K'
+
+    # horizontal movement == positive two spaces && no vertical movement
+    kingside = @move.destination_coordinates[1] == (@move.origin_coordinates[1] + 2)
+
+    # horizontal movement == negative 3 spaces && no vertical movement
+    queenside = @move.destination_coordinates[1] == (@move.origin_coordinates[1] - 2)
+
+    return queenside || kingside
   end
 end

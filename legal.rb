@@ -16,16 +16,29 @@ class LegalityChecker
     queen_legal_move?: 'Q'
   }.freeze
 
-  attr_accessor :move, :current_player, :opponent_color
+  attr_accessor :move, :current_player, :opponent_color, :opponent_player
 
   def initialize(move, current_player)
     @move = move
     @current_player = current_player
-    @opponent_color = @current_player.color == 'black' ? 'white' : 'black'
-    @opponent_player = Player.new('opponent', @opponent_color.to_s)
   end
 
   def legal_move?
+    # if move is a castle move (follows basic movement rules)
+    if castle?
+      # see if it's a legal castle move (follows castle rules)
+      return false unless castle_path_clear?
+
+      (@move.origin_coordinates[1]..@move.destination_coordinates[1]).each do |square|
+
+        current_square = LegalityChecker.new(@move, @current_player)
+
+        unless current_square.safe_from_check?(@current_player, [@move.origin_coordinates[0], square])
+          return false
+        end
+      end
+    end
+
     LEGAL_MOVE_TYPES.any? do |method, piece_type|
       send(method) if @move.origin_piece.type == piece_type
     end
@@ -67,5 +80,11 @@ class LegalityChecker
 
   def difference(a, b)
     (a - b).abs
+  end
+
+  # creates new move string based on desired origin and destination coordinates and creates new Move object using said string 
+  def new_simulated_move(origin_coordinate, destination_coordinate, player)
+    simulated_move_string = coordinates_to_move_string(origin_coordinate, destination_coordinate)
+    Move.new(@move.current_game_board, player, simulated_move_string)
   end
 end

@@ -69,4 +69,8 @@ module PathClear
     end
     true
   end
+
+  def castle_path_clear?
+    horizontal_path_clear? && @move.destination_cell.empty?
+  end
 end

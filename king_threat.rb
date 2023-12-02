@@ -40,37 +40,36 @@ module KingThreat
     player_pieces
   end
 
-  def safe_from_check?(chosen_player)
-    opposite_player = chosen_player.color == @current_player.color ? @opponent_player : @current_player
+  def safe_from_check?(chosen_player, king_location = nil)
 
-    chosen_player_king = find_king(chosen_player)
+    king_location ||= find_king(chosen_player)
+
+    opposite_player = chosen_player.color == @current_player.color ? @move.opponent_player : @current_player
+
     opposite_player_pieces = gather_piece_locations(opposite_player)
 
     opposite_player_pieces.each do |coordinate_pair|
-      new_move_string = coordinates_to_move_string(coordinate_pair, chosen_player_king)
 
-      new_move = Move.new(@move.current_game_board, chosen_player, new_move_string)
-
-      # false means an opposing player's piece can capture the king being checked
+      new_move = new_simulated_move(coordinate_pair, king_location, chosen_player)
       return false if LegalityChecker.new(new_move, opposite_player).legal_move?
     end
     return true
   end
 
   def checkmate?
-    opponent_player_pieces = gather_piece_locations(@opponent_player)
+    opponent_player_pieces = gather_piece_locations(@move.opponent_player)
 
     all_coordinates.each do |destination_coordinate|
 
       opponent_player_pieces.each do |piece_coordinate|
 
-        simulated_move_string = coordinates_to_move_string(piece_coordinate, destination_coordinate)
-        simulated_move = Move.new(@move.current_game_board, @opponent_player, simulated_move_string)
+        simulated_move = new_simulated_move(piece_coordinate, destination_coordinate, @move.opponent_player)
 
-        next unless LegalityChecker.new(simulated_move, @opponent_player).legal_move?
+        next unless LegalityChecker.new(simulated_move, @move.opponent_player).legal_move?
+
         simulated_move.move_piece
 
-        if LegalityChecker.new(simulated_move, @opponent_player).safe_from_check?(@opponent_player)
+        if LegalityChecker.new(simulated_move, @move.opponent_player).safe_from_check?(@move.opponent_player)
           simulated_move.undo_move
           return false
         else

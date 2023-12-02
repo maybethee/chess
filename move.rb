@@ -1,13 +1,16 @@
 class Move
   CHAR_CONVERSION = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7 }.freeze
 
-  attr_reader :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board, :current_player, :game_over
+  attr_reader :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board, :current_player, :opponent_color, :opponent_player, :game_over
 
   def initialize(current_game_board, current_player, user_move_string = nil, game_over = false)
     # @current_game_board and @current_player should be the attributes from Game class
     @current_game_board = current_game_board
+
     @current_player = current_player
-    
+    @opponent_color = @current_player.color == 'black' ? 'white' : 'black'
+    @opponent_player = Player.new('opponent', @opponent_color.to_s)
+
     # move is user inputted coordinate String
     @user_move_string = user_move_string
 
@@ -22,10 +25,11 @@ class Move
 
     @destination_cell = current_game_board[@destination_coordinates[0]][@destination_coordinates[1]]
     @destination_piece = @destination_cell.square
+    # p "dest piece #{@destination_piece}"
 
     @game_over = game_over
   end
-  
+
   def translate_origin_coordinates(coordinate_string, char_int_hash)
     # if string looks like 'e7e5', origin_coordinates array looks like this:
     # [6, 4]
@@ -47,20 +51,42 @@ class Move
     @destination_cell.square = @destination_piece
   end
 
+  def complete_castle(move)
+    return unless move.castle?
+
+    if @destination_coordinates[1] == (@origin_coordinates[1] - 2) 
+      # move appropriate rook to correct square
+
+      # king's destination + 1 horizontally
+      current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] + 1)].square = Piece.new('R', @current_player.color, true)
+
+      # relevant rook's location
+      current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] - 2)].square = ' '
+    else
+      # move kingside rook to correct square
+      current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] - 1)].square = Piece.new('R', @current_player.color, true)
+
+      current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] + 1)].square = ' '
+    end
+  end
+
   def execute_move
     if @origin_cell.empty?
       puts "can't move what's not there!"
       return false
     end
 
-    unless LegalityChecker.new(self, @current_player).legal_move?
+    new_move = LegalityChecker.new(self, @current_player)
+
+    unless new_move.legal_move?
       puts 'something else went wrong'
       return false
     end
 
     move_piece
+    complete_castle(new_move)
 
-    unless LegalityChecker.new(self, @current_player).safe_from_check?(@current_player)
+    unless new_move.safe_from_check?(@current_player)
       undo_move
       puts 'not safe from check'
       return false
@@ -71,7 +97,7 @@ class Move
 
     checkmate = LegalityChecker.new(self, @current_player).checkmate?
     @game_over = true if checkmate
-    puts checkmate ? "Checkmate! #{@current_player.color} wins" : "not checkmated"
+    puts checkmate ? "Checkmate! #{@current_player.color} wins" : 'not checkmated'
     true
   end
 end
