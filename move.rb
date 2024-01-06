@@ -92,6 +92,8 @@ class Move
       return false
     end
 
+    @origin_piece.promote if promotion?
+
     # change state of has_moved once move has been finalized here
     @origin_piece.has_moved = true
 
@@ -99,5 +101,18 @@ class Move
     @game_over = true if checkmate
     puts checkmate ? "Checkmate! #{@current_player.color} wins" : 'not checkmated'
     true
+  end
+
+  def promotion?
+    # piece type is a pawn and destination square is back rank of opposite color
+    return false unless @origin_piece.type == 'P'
+
+    destination = @destination_coordinates[0] == opposite_back_rank
+
+    return destination
+  end
+
+  def opposite_back_rank
+    @current_player.color == 'black' ? 0 : 7
   end
 end
