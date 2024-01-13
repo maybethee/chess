@@ -18,10 +18,10 @@ class Piece
   end
 
   def promotion_input
-    puts "which piece to promote to? type the letter representing the piece in chess notation:\n\n(Queen = Q, Rook = R, Bishop = B, Knight = N)"
+    puts "Which piece to promote to? Type the letter representing the piece in chess notation:\n\n(Queen = Q, Rook = R, Bishop = B, Knight = N)"
 
     loop do
-      error_message = "invalid type\n\n"
+      error_message = "Invalid piece type.\n\n"
       new_type = gets.chomp
       return new_type.upcase if valid_type?(new_type.downcase)
 

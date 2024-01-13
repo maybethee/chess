@@ -5,9 +5,9 @@ def execute_mode(mode_name)
 end
 
 def player_input
-  puts "welcome to chess,\n\ntype 'play' to start a new game, or 'continue' to load a saved game."
+  puts "WELCOME TO CHESS,\n\nType 'play' to start a new game, or 'continue' to load a saved game."
   loop do
-    error_message = "invalid input\n\n"
+    error_message = "Invalid input.\n\n"
     mode = gets.chomp
     return mode if valid?(mode.downcase)
 

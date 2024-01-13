@@ -72,14 +72,14 @@ class Move
 
   def execute_move
     if @origin_cell.empty?
-      puts "can't move what's not there!"
+      puts "Starting square is empty!"
       return false
     end
 
     new_move = LegalityChecker.new(self, @current_player)
 
     unless new_move.legal_move?
-      puts 'something else went wrong'
+      puts 'ERROR: Something went wrong.'
       return false
     end
 
@@ -88,7 +88,7 @@ class Move
 
     unless new_move.safe_from_check?(@current_player)
       undo_move
-      puts 'not safe from check'
+      puts 'Not safe from check.'
       return false
     end
 

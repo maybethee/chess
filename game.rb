@@ -18,8 +18,27 @@ class Game
     @previous_moves = []
   end
 
+  def help_statement
+    statement = <<~HELP_STATEMENT
+
+      Play your moves by typing the coordinates of the starting square followed by the destination square.
+
+      For example: to move the white pawn to the E4 square, type 'e2e4' and press ENTER.
+
+      This program will not accept any supplementary or alternative form of notation.
+
+      Other options:
+        --'save' to save and quit the game anytime.
+        --'help' to print this message again.
+    HELP_STATEMENT
+
+    puts statement
+  end
+
   def play
+    help_statement
     @board.print_board
+
     loop do
       player_move_string = player_input
 
@@ -36,19 +55,23 @@ class Game
 
       break if current_move.game_over == true
     end
-    puts 'thanks for playing!'
+
+    puts 'Thanks for playing!'
   end
 
   def player_input
-    puts "(type 'save' anytime to save and quit the game)\n\n#{@current_player.color}, enter your move"
-    
+    puts "#{@current_player.color}, enter your move:"
     loop do
-      error_message = "invalid input\n\n"
+      error_message = "Invalid input.\n\n"
       player_move_string = gets.chomp
 
-      if player_move_string.downcase.eql?('save')
+      case player_move_string.downcase
+      when 'save'
         save_game
         break
+      when 'help'
+        help_statement
+        next
       end
 
       return player_move_string if valid?(player_move_string.downcase)
