@@ -1,20 +1,29 @@
 require 'colorize'
 
 class Piece
-  attr_accessor :type, :color, :has_moved
+  WHITE_PROMOTION_CONVERSION = { 'R' => '♖', 'N' => '♘', 'B' => '♗', 'Q' => '♕' }.freeze
+  BLACK_PROMOTION_CONVERSION = { 'R' => '♜', 'N' => '♞', 'B' => '♝', 'Q' => '♛' }.freeze
 
-  def initialize(type, color, has_moved = false)
+  attr_accessor :type, :color, :has_moved, :symbol
+
+  def initialize(type, color, symbol, has_moved = false)
     @type = type
     @color = color
+    @symbol = symbol
     @has_moved = has_moved
   end
 
   def to_s
-    @type.colorize(@color.to_sym)
+    @symbol.colorize(@color.to_sym)
   end
 
   def promote
     @type = promotion_input
+    @symbol = if @color.eql?('white')
+                WHITE_PROMOTION_CONVERSION.fetch(@type)
+              else
+                BLACK_PROMOTION_CONVERSION.fetch(@type)
+              end
   end
 
   def promotion_input
@@ -23,13 +32,13 @@ class Piece
     loop do
       error_message = "Invalid piece type.\n\n"
       new_type = gets.chomp
-      return new_type.upcase if valid_type?(new_type.downcase)
+      return new_type.upcase if valid_type?(new_type)
 
       puts error_message
     end
   end
 
   def valid_type?(string)
-    !!string.match?(/^[qrbn]$/)
+    !!string.upcase.match?(/^[QBRN]$/)
   end
 end

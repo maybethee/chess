@@ -1,24 +1,43 @@
 require 'colorize'
 
 class Board
-  BACK_PIECES = %w[R N B Q K B N R].freeze
+  WHITE_BACK_PIECES_ARRAY = [
+    ['R', '♖'],
+    ['N', '♘'],
+    ['B', '♗'],
+    ['Q', '♕'],
+    ['K', '♔'],
+    ['B', '♗'],
+    ['N', '♘'],
+    ['R', '♖']
+  ].freeze
+
+  BLACK_BACK_PIECES_ARRAY = [
+    ['R', '♜'],
+    ['N', '♞'],
+    ['B', '♝'],
+    ['Q', '♛'],
+    ['K', '♚'],
+    ['B', '♝'],
+    ['N', '♞'],
+    ['R', '♜']
+  ].freeze
 
   attr_accessor :cells, :back_row_white, :back_row_black
 
   def initialize
-    # full board minus two back rows added manually later
     @cells = Array.new(6) { Array.new(8) { Cell.new } }
-    @back_row_white = BACK_PIECES.map { |piece| Cell.new(Piece.new("#{piece}", 'white')) }
-    @back_row_black = BACK_PIECES.map { |piece| Cell.new(Piece.new("#{piece}", 'black')) }
+    @back_row_white = WHITE_BACK_PIECES_ARRAY.map { |piece, symbol| Cell.new(Piece.new(piece, 'white', symbol)) }
+    @back_row_black = BLACK_BACK_PIECES_ARRAY.map { |piece, symbol| Cell.new(Piece.new(piece, 'black', symbol)) }
     fill_pieces
   end
 
   def fill_pawns
     @cells[0].each do |cell|
-      cell.square = Piece.new('P', 'white')
+      cell.square = Piece.new('P', 'white', '♙')
     end
     @cells[5].each do |cell|
-      cell.square = Piece.new('P', 'black')
+      cell.square = Piece.new('P', 'black', '♟')
     end
   end
 
@@ -28,8 +47,6 @@ class Board
     @cells.push(@back_row_black)
   end
 
-  # maybe add a parameter to print_board for player.color (when you make player class)
-  # if i do this i need to figure out how to change calling coordinates on move_piece/translate_move_string
   def print_board
     puts '  ________________________________'
     @cells.each_with_index do |row, id|
