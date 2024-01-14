@@ -16,11 +16,14 @@ class LegalityChecker
     queen_legal_move?: 'Q'
   }.freeze
 
-  attr_accessor :move, :current_player, :opponent_color, :opponent_player
+  attr_accessor :move, :current_player, :opponent_color, :opponent_player, :previous_move_obj
 
-  def initialize(move, current_player)
+  def initialize(move, current_player, previous_move_obj = nil)
     @move = move
     @current_player = current_player
+
+    # @previous_move is a new Move object storing data for the previous move
+    @previous_move_obj = previous_move_obj
   end
 
   def legal_move?
@@ -33,9 +36,8 @@ class LegalityChecker
 
         current_square = LegalityChecker.new(@move, @current_player)
 
-        unless current_square.safe_from_check?(@current_player, [@move.origin_coordinates[0], square])
-          return false
-        end
+        return false unless current_square.safe_from_check?(@current_player, [@move.origin_coordinates[0], square])
+
       end
     end
 

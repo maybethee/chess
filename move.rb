@@ -1,9 +1,9 @@
 class Move
   CHAR_CONVERSION = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7 }.freeze
 
-  attr_reader :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board, :current_player, :opponent_color, :opponent_player, :game_over
+  attr_accessor :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board, :current_player, :opponent_color, :opponent_player, :game_over, :previous_move
 
-  def initialize(current_game_board, current_player, user_move_string = nil, game_over = false)
+  def initialize(current_game_board, current_player, user_move_string = nil, previous_move = nil, game_over = false)
     # @current_game_board and @current_player should be the attributes from Game class
     @current_game_board = current_game_board
 
@@ -25,9 +25,10 @@ class Move
 
     @destination_cell = current_game_board[@destination_coordinates[0]][@destination_coordinates[1]]
     @destination_piece = @destination_cell.square
-    # p "dest piece #{@destination_piece}"
 
     @game_over = game_over
+
+    @previous_move = previous_move
   end
 
   def translate_origin_coordinates(coordinate_string, char_int_hash)
@@ -72,11 +73,17 @@ class Move
 
   def execute_move
     if @origin_cell.empty?
-      puts "Starting square is empty!"
+      puts "can't move what's not there!"
       return false
     end
 
-    new_move = LegalityChecker.new(self, @current_player)
+    # new move object using @previous_move string to replace standard user_move_string, getting attribute information from prior move 
+    if @previous_move
+      previous_move_obj = Move.new(@current_game_board, @current_player, @previous_move)
+      new_move = LegalityChecker.new(self, @current_player, previous_move_obj)
+    else
+      new_move = LegalityChecker.new(self, @current_player)
+    end
 
     unless new_move.legal_move?
       puts 'ERROR: Something went wrong.'

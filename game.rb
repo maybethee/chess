@@ -45,7 +45,7 @@ class Game
       # move string will not reach return when player inputs 'save', making it nil
       break if player_move_string.nil?
 
-      current_move = Move.new(@board.cells, @current_player, player_move_string)
+      current_move = Move.new(@board.cells, @current_player, player_move_string, @previous_moves.last)
 
       switch_players unless current_move.execute_move == false
 
