@@ -31,7 +31,7 @@ class LegalityChecker
   def legal_move?
     # if move is a castle move (follows basic movement rules)
     if castle?
-      # see if it's a legal castle move (follows castle rules)
+      # see if it's a legal castle move (abides by castle rules)
       return false unless castle_path_clear?
 
       (@move.origin_coordinates[1]..@move.destination_coordinates[1]).each do |square|
@@ -43,10 +43,8 @@ class LegalityChecker
       end
     end
 
-    # remove captured en_passant pawn since normal execute move won't do this
-    if pawn_legal_move? && en_passant?
-      @previous_move_obj.destination_cell.square = ' '
-    end
+    # remove pawn captured by en_passant move piece method won't do this
+    @previous_move_obj.destination_cell.square = ' ' if pawn_legal_move? && en_passant?
 
     LEGAL_MOVE_TYPES.any? do |method, piece_type|
       send(method) if @move.origin_piece.type == piece_type

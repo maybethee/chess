@@ -37,7 +37,6 @@ module PathClear
     true
   end
 
-  # need to think of how to make this more concise...
   def diagonal_path_clear?
     current_origin = @move.origin_coordinates.dup
     current_destination = @move.destination_coordinates.dup

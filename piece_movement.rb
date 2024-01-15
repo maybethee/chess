@@ -28,7 +28,7 @@ module PieceMovement
 
     two_spaces = forward?(2)
 
-    # need to check both because pawns cannot capture on forward movement, and path clear does not check destination square 
+    # need to check both because pawns cannot capture on forward movement, and path clear does not check destination square
     path_clear = vertical_path_clear? && @move.destination_cell.empty?
 
     first_move && two_spaces && path_clear
