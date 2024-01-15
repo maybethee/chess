@@ -1,10 +1,9 @@
 require 'colorize'
 
 class Piece
-  WHITE_PROMOTION_CONVERSION = { 'R' => '♖', 'N' => '♘', 'B' => '♗', 'Q' => '♕' }.freeze
-  BLACK_PROMOTION_CONVERSION = { 'R' => '♜', 'N' => '♞', 'B' => '♝', 'Q' => '♛' }.freeze
+  PROMOTION_CONVERSION = { 'R' => '♜', 'N' => '♞', 'B' => '♝', 'Q' => '♛' }.freeze
 
-  attr_accessor :type, :color, :has_moved, :symbol
+  attr_accessor :type, :color, :symbol, :has_moved
 
   def initialize(type, color, symbol, has_moved = false)
     @type = type
@@ -19,11 +18,7 @@ class Piece
 
   def promote
     @type = promotion_input
-    @symbol = if @color.eql?('white')
-                WHITE_PROMOTION_CONVERSION.fetch(@type)
-              else
-                BLACK_PROMOTION_CONVERSION.fetch(@type)
-              end
+    @symbol = PROMOTION_CONVERSION.fetch(@type)  
   end
 
   def promotion_input

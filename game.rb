@@ -96,21 +96,25 @@ class Game
   end
 
   def continue
-    saved_previous_moves = YAML.safe_load(File.read('game.yml')) 
+    saved_previous_moves = YAML.safe_load(File.read('game.yml'))
     load_game(saved_previous_moves)
   end
 
-  # load game quietly playing each move normally without printing board state before calling play
+  # plays each move normally without printing the board prior to calling the play method, allowing the players to begin where they left off in a "saved" game
   def load_game(previous_moves_file)
     # iterate through array of previous moves loaded from the yaml file
     previous_moves_file.each do |previous_move_string|
 
       current_move = Move.new(@board.cells, @current_player, previous_move_string)
 
-      @previous_moves << previous_move_string
+      # re-add moves to new previous moves array in case of writing over save file
+      if current_move.execute_move
+        switch_players
+        @previous_moves << previous_move_string
+      end
 
-      switch_players unless current_move.execute_move == false
     end
+    # then calls play method to start game for the player
     play
   end
 end

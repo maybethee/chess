@@ -114,9 +114,7 @@ class Move
     # piece type is a pawn and destination square is back rank of opposite color
     return false unless @origin_piece.type == 'P'
 
-    destination = @destination_coordinates[0] == opposite_back_rank
-
-    return destination
+    return true if destination_coordinates[0] == opposite_back_rank
   end
 
   def opposite_back_rank
