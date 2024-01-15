@@ -1,18 +1,7 @@
 require 'colorize'
 
 class Board
-  WHITE_BACK_PIECES_ARRAY = [
-    ['R', '♖'],
-    ['N', '♘'],
-    ['B', '♗'],
-    ['Q', '♕'],
-    ['K', '♔'],
-    ['B', '♗'],
-    ['N', '♘'],
-    ['R', '♖']
-  ].freeze
-
-  BLACK_BACK_PIECES_ARRAY = [
+  BACK_PIECES_ARRAY = [
     ['R', '♜'],
     ['N', '♞'],
     ['B', '♝'],
@@ -27,14 +16,14 @@ class Board
 
   def initialize
     @cells = Array.new(6) { Array.new(8) { Cell.new } }
-    @back_row_white = WHITE_BACK_PIECES_ARRAY.map { |piece, symbol| Cell.new(Piece.new(piece, 'white', symbol)) }
-    @back_row_black = BLACK_BACK_PIECES_ARRAY.map { |piece, symbol| Cell.new(Piece.new(piece, 'black', symbol)) }
+    @back_row_white = BACK_PIECES_ARRAY.map { |piece, symbol| Cell.new(Piece.new(piece, 'white', symbol)) }
+    @back_row_black = BACK_PIECES_ARRAY.map { |piece, symbol| Cell.new(Piece.new(piece, 'black', symbol)) }
     fill_pieces
   end
 
   def fill_pawns
     @cells[0].each do |cell|
-      cell.square = Piece.new('P', 'white', '♙')
+      cell.square = Piece.new('P', 'white', '♟')
     end
     @cells[5].each do |cell|
       cell.square = Piece.new('P', 'black', '♟')

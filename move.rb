@@ -4,7 +4,7 @@ class Move
   attr_accessor :user_move_string, :origin_coordinates, :origin_cell, :origin_piece, :destination_coordinates, :destination_cell, :destination_piece, :current_game_board, :current_player, :opponent_color, :opponent_player, :game_over, :previous_move
 
   def initialize(current_game_board, current_player, user_move_string = nil, previous_move = nil, game_over = false)
-    # @current_game_board and @current_player should be the attributes from Game class
+
     @current_game_board = current_game_board
 
     @current_player = current_player
@@ -43,7 +43,7 @@ class Move
   end
 
   def move_piece
-    @destination_cell.square = @origin_piece  
+    @destination_cell.square = @origin_piece
     @origin_cell.square = ' '
   end
 
@@ -55,17 +55,17 @@ class Move
   def complete_castle(move)
     return unless move.castle?
 
-    if @destination_coordinates[1] == (@origin_coordinates[1] - 2) 
+    if @destination_coordinates[1] == (@origin_coordinates[1] - 2)
       # move appropriate rook to correct square
 
       # king's destination + 1 horizontally
-      current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] + 1)].square = Piece.new('R', @current_player.color, true)
+      current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] + 1)].square = Piece.new('R', @current_player.color, '♜', true)
 
       # relevant rook's location
       current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] - 2)].square = ' '
     else
       # move kingside rook to correct square
-      current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] - 1)].square = Piece.new('R', @current_player.color, true)
+      current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] - 1)].square = Piece.new('R', @current_player.color, '♜', true)
 
       current_game_board[@destination_coordinates[0]][(@destination_coordinates[1] + 1)].square = ' '
     end
