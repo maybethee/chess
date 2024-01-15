@@ -1,4 +1,4 @@
-require_relative 'game'
+require_relative './lib/game'
 
 def execute_mode(mode_name)
   mode_name.send(player_input)
