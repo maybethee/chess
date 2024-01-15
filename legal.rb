@@ -22,7 +22,9 @@ class LegalityChecker
     @move = move
     @current_player = current_player
 
-    # @previous_move is a new Move object storing data for the previous move
+    # @previous_move_obj is a new Move object storing data for the previous move
+
+    # Note: because it maintains a current board state, some attributes of @previous_move_obj like @origin_coordinates and @origin_piece will point to an empty square, so the @destination counterparts should be used instead
     @previous_move_obj = previous_move_obj
   end
 
@@ -39,6 +41,11 @@ class LegalityChecker
         return false unless current_square.safe_from_check?(@current_player, [@move.origin_coordinates[0], square])
 
       end
+    end
+
+    # remove captured en_passant pawn since normal execute move won't do this
+    if pawn_legal_move? && en_passant?
+      @previous_move_obj.destination_cell.square = ' '
     end
 
     LEGAL_MOVE_TYPES.any? do |method, piece_type|

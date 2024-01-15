@@ -3,21 +3,23 @@ module PieceMovement
 
   def pawn_legal_move?
     return false unless right_color? && @move.origin_piece.type == 'P'
-    
+
     one_space = pawn_one_space?
-    
+
     two_spaces = pawn_two_space?
 
     capture = pawn_capture?
 
-    return one_space || two_spaces || capture
+    en_passant = en_passant?
+
+    return one_space || two_spaces || capture || en_passant
   end
 
   def pawn_one_space?
     one_space = forward?(1)
 
     path_clear = @move.destination_cell.empty?
-    
+
     one_space && path_clear
   end
 
@@ -41,7 +43,35 @@ module PieceMovement
 
     diagonal && has_piece
   end
-  
+
+
+
+  def en_passant?
+    return false unless @previous_move_obj
+
+    diagonal = diagonal_pawn?
+
+    # The capturing pawn must have advanced exactly three ranks to perform this move.
+    legal_rank = en_passant_rank?
+
+    # The captured pawn must have moved two squares in one move, landing right next to the capturing pawn.
+    legal_captured_piece_type = @previous_move_obj.destination_piece.type == 'P'
+
+    neighboring_file = difference(@previous_move_obj.destination_coordinates[1], @move.origin_coordinates[1]) == 1
+
+    capture_direction = @previous_move_obj.destination_coordinates[1] == @move.destination_coordinates[1]
+
+    diagonal && legal_rank && legal_captured_piece_type && neighboring_file && capture_direction
+  end
+
+  def en_passant_rank?
+    if @current_player.color == 'black'
+      return true if @move.origin_coordinates[0] == 3 && @previous_move_obj.destination_coordinates[0] == 3
+    else
+      return true if @move.origin_coordinates[0] == 4 && @previous_move_obj.destination_coordinates[0] == 4
+    end
+  end
+
   def diagonal_pawn?
     # black vs. white changes whether operator comparing origin and destination[0] is greater or less than determining possible direction "forward"
     if @current_player.color == 'black'

@@ -47,15 +47,16 @@ class Game
 
       current_move = Move.new(@board.cells, @current_player, player_move_string, @previous_moves.last)
 
-      switch_players unless current_move.execute_move == false
+      if current_move.execute_move
+        switch_players
+        @previous_moves << player_move_string
+      end
 
       @board.print_board
 
-      @previous_moves << player_move_string
-
       break if current_move.game_over == true
     end
-
+    
     puts 'Thanks for playing!'
   end
 
